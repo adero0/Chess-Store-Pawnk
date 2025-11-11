@@ -1,0 +1,7 @@
+package com.akacin.sklep_szachowy.model.enums;
+
+public enum ERole {
+  ROLE_USER,
+  ROLE_MODERATOR,
+  ROLE_ADMIN
+}
