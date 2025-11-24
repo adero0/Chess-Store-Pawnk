@@ -1,4 +1,3 @@
-
 package com.akacin.sklep_szachowy.service;
 
 import com.akacin.sklep_szachowy.dto.ProductDto;
@@ -6,6 +5,7 @@ import com.akacin.sklep_szachowy.dto.ProductRequestDto;
 import com.akacin.sklep_szachowy.model.Category;
 import com.akacin.sklep_szachowy.model.Product;
 import com.akacin.sklep_szachowy.model.User;
+import com.akacin.sklep_szachowy.model.enums.ERole;
 import com.akacin.sklep_szachowy.repository.CategoryRepository;
 import com.akacin.sklep_szachowy.repository.ProductRepository;
 import com.akacin.sklep_szachowy.repository.UserRepository;
@@ -31,6 +31,9 @@ public class ProductService {
         User author = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
+        // Walidacja uprawnień
+        validateUserPermissions(author, productRequest.getCategoryName());
+
         Category category = categoryRepository.findByName(productRequest.getCategoryName())
                 .orElseGet(() -> categoryRepository.save(new Category(productRequest.getCategoryName())));
 
@@ -46,6 +49,22 @@ public class ProductService {
 
         Product savedProduct = productRepository.save(product);
         return convertToDto(savedProduct);
+    }
+
+    private void validateUserPermissions(User user, String categoryName) {
+        boolean hasAdminRole = user.getRoles().stream().anyMatch(role -> ERole.ROLE_ADMIN.equals(role.getName()));
+        if (hasAdminRole) {
+            return;
+        }
+
+        boolean hasModeratorRoleForCategory = user.getRoles().stream()
+                .anyMatch(role -> ERole.ROLE_MODERATOR.equals(role.getName()) &&
+                        role.getCategory() != null &&
+                        role.getCategory().getName().equals(categoryName));
+
+        if (!hasModeratorRoleForCategory) {
+            throw new RuntimeException("Brak uprawnień do dodawania produktów w tej kategorii.");
+        }
     }
 
     public List<ProductDto> getApprovedProducts() {

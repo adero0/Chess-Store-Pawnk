@@ -27,3 +27,11 @@ export const getProductById = async (id: string): Promise<Product> => {
     const response = await apiClient.get<Product>(`${API_URL_PRODUCTS}/${id}`);
     return response.data;
 };
+
+export const createProduct = async (formData: FormData): Promise<void> => {
+    await apiClient.post(API_URL_PRODUCTS, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
