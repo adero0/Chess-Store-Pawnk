@@ -4,7 +4,11 @@ import com.akacin.sklep_szachowy.dto.OrderDto;
 import com.akacin.sklep_szachowy.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -18,5 +22,12 @@ public class OrderController {
     public ResponseEntity<Void> createOrder(@RequestBody OrderDto orderDto) {
         orderService.createOrder(orderDto);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<OrderDto>> getUserOrders(Authentication authentication) {
+        String username = authentication.getName();
+        return ResponseEntity.ok(orderService.getOrdersForUser(username));
     }
 }

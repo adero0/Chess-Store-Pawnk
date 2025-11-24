@@ -79,6 +79,7 @@ const Dashboard: React.FC<{ setIsAuthenticated: (isAuth: boolean) => void }> = (
         flexDirection: 'column',
         alignItems: 'center',
         textAlign: 'center',
+        position: 'relative',
     };
 
     const cardIconStyle: React.CSSProperties = {
@@ -114,6 +115,16 @@ const Dashboard: React.FC<{ setIsAuthenticated: (isAuth: boolean) => void }> = (
 
             <div style={gridStyle}>
                 {isAdminOrModerator && (
+                     <Link to="/admin/comments" style={cardStyle}
+                     onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; }}
+                     onMouseLeave={e => { e.currentTarget.style.transform = 'none'; }}>
+                   <svg style={cardIconStyle} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+                   <h2 style={cardTitleStyle}>Weryfikacja Komentarzy</h2>
+                   <p style={cardDescriptionStyle}>Zarządzaj i zatwierdzaj komentarze użytkowników.</p>
+               </Link>
+                )}
+
+                {isAdminOrModerator && (
                     <Link to="/admin/slider" style={cardStyle}
                           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; }}
                           onMouseLeave={e => { e.currentTarget.style.transform = 'none'; }}>
@@ -132,6 +143,14 @@ const Dashboard: React.FC<{ setIsAuthenticated: (isAuth: boolean) => void }> = (
                         <p style={cardDescriptionStyle}>Zarządzaj użytkownikami, rolami i uprawnieniami.</p>
                     </Link>
                 )}
+
+                <Link to="/orders" style={cardStyle}
+                      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.transform = 'none'; }}>
+                    <svg style={cardIconStyle} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm0 15l-4-4h3V9h2v5h3l-4 4z"/></svg>
+                    <h2 style={cardTitleStyle}>Moje Zamówienia</h2>
+                    <p style={cardDescriptionStyle}>Śledź i zarządzaj swoimi zamówieniami.</p>
+                </Link>
                 
                 <Link to="/cart" style={cardStyle}
                       onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; }}

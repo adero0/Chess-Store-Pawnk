@@ -1,9 +1,9 @@
 package com.akacin.sklep_szachowy.model.enums;
 
 public enum EOrderStatus {
-    NEW,
-    PROCESSING,
+    PENDING,
+    PAID,
     SHIPPED,
     DELIVERED,
-    CANCELED
+    CANCELLED
 }

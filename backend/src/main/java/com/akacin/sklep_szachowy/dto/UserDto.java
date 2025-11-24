@@ -16,7 +16,11 @@ public class UserDto {
         this.username = username;
         this.email = email;
         this.roles = roles.stream()
-                .map(role -> new RoleDto(role.getId(), role.getName()))
+                .map(role -> new RoleDto(
+                        role.getId(),
+                        role.getName(),
+                        role.getCategory() != null ? role.getCategory().getId() : null
+                ))
                 .collect(Collectors.toSet());
     }
 

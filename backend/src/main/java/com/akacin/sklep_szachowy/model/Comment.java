@@ -1,5 +1,6 @@
 package com.akacin.sklep_szachowy.model;
 
+import com.akacin.sklep_szachowy.model.enums.ECommentStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.CreationTimestamp;
@@ -25,7 +26,12 @@ public class Comment {
     @JoinColumn(name = "user_id", nullable = false)
     private User author;
 
+    // TODO: This is a temporary workaround for a database schema issue.
+    // The 'approved' column should be removed from the 'comments' table.
     private boolean approved = false;
+
+    @Enumerated(EnumType.STRING)
+    private ECommentStatus status = ECommentStatus.PENDING;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -79,6 +85,14 @@ public class Comment {
 
     public void setApproved(boolean approved) {
         this.approved = approved;
+    }
+
+    public ECommentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ECommentStatus status) {
+        this.status = status;
     }
 
     public LocalDateTime getCreatedAt() {

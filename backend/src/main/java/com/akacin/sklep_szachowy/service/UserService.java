@@ -1,9 +1,12 @@
 package com.akacin.sklep_szachowy.service;
 
+import com.akacin.sklep_szachowy.dto.RoleDto;
 import com.akacin.sklep_szachowy.dto.UserDto;
+import com.akacin.sklep_szachowy.model.Category;
 import com.akacin.sklep_szachowy.model.Role;
 import com.akacin.sklep_szachowy.model.User;
 import com.akacin.sklep_szachowy.model.enums.ERole;
+import com.akacin.sklep_szachowy.repository.CategoryRepository;
 import com.akacin.sklep_szachowy.repository.RoleRepository;
 import com.akacin.sklep_szachowy.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,9 @@ public class UserService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
@@ -54,17 +60,37 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto updateUserRoles(Long userId, Set<String> roleNames) {
-        if (roleNames == null || roleNames.isEmpty()) {
+    public UserDto updateUserRoles(Long userId, Set<RoleDto> roleDtos) {
+        if (roleDtos == null || roleDtos.isEmpty()) {
             throw new IllegalArgumentException("A user must have at least one role.");
         }
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
-        Set<Role> roles = roleNames.stream()
-                .map(roleName -> roleRepository.findByName(ERole.valueOf(roleName))
-                        .orElseThrow(() -> new RuntimeException("Role not found: " + roleName)))
+        Set<Role> roles = roleDtos.stream()
+                .map(roleDto -> {
+                    Role role;
+                    if (roleDto.getName().equals(ERole.ROLE_MODERATOR)) {
+                        if (roleDto.getCategoryId() == null) {
+                            throw new IllegalArgumentException("Category ID is required for moderator role.");
+                        }
+                        Category category = categoryRepository.findById(roleDto.getCategoryId())
+                                .orElseThrow(() -> new RuntimeException("Category not found with id: " + roleDto.getCategoryId()));
+
+                        role = roleRepository.findByNameAndCategory(roleDto.getName(), category)
+                                .orElseGet(() -> {
+                                    Role newRole = new Role(roleDto.getName());
+                                    newRole.setCategory(category);
+                                    return roleRepository.save(newRole);
+                                });
+
+                    } else {
+                        role = roleRepository.findByName(roleDto.getName())
+                                .orElseThrow(() -> new RuntimeException("Role not found: " + roleDto.getName()));
+                    }
+                    return role;
+                })
                 .collect(Collectors.toSet());
 
         user.setRoles(roles);

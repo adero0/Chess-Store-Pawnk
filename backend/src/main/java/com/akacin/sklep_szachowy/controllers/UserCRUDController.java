@@ -38,7 +38,7 @@ public class UserCRUDController {
 
     @PutMapping("/{id}/roles")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserDto> updateUserRoles(@PathVariable Long id, @RequestBody Set<String> roles) {
+    public ResponseEntity<UserDto> updateUserRoles(@PathVariable Long id, @RequestBody Set<com.akacin.sklep_szachowy.dto.RoleDto> roles) {
         return ResponseEntity.ok(userService.updateUserRoles(id, roles));
     }
 

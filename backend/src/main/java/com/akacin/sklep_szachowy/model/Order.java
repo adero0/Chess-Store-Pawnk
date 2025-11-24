@@ -1,5 +1,6 @@
 package com.akacin.sklep_szachowy.model;
 
+import com.akacin.sklep_szachowy.model.enums.EOrderStatus;
 import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +25,9 @@ public class Order {
     private Date orderDate;
 
     private Date deliveryDate;
+
+    @Enumerated(EnumType.STRING)
+    private EOrderStatus status = EOrderStatus.PENDING;
 
     public Order() {}
 
@@ -74,5 +78,13 @@ public class Order {
 
     public void setDeliveryDate(Date deliveryDate) {
         this.deliveryDate = deliveryDate;
+    }
+
+    public EOrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EOrderStatus status) {
+        this.status = status;
     }
 }

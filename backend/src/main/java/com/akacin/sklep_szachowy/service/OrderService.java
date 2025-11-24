@@ -86,4 +86,10 @@ public class OrderService {
         sb.append(String.format("Estimated Delivery Date: %s\n", order.getDeliveryDate().toString()));
         return sb.toString();
     }
+
+    public List<OrderDto> getOrdersForUser(String username) {
+        return orderRepository.findByUser_Username(username).stream()
+                .map(OrderDto::new)
+                .collect(Collectors.toList());
+    }
 }

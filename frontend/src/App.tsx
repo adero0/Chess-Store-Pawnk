@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Auth from './components/Auth';
 import Home from './components/Home';
@@ -9,17 +9,47 @@ import CategoryPage from './components/CategoryPage';
 import CartPage from './components/CartPage'; // Import CartPage
 import SliderManagementPage from './components/SliderManagementPage';
 import UserManagementPage from "./components/UserManagementPage";
+import CommentVerificationPage from "./components/CommentVerificationPage";
+import OrderHistoryPage from "./components/OrderHistoryPage";
 import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import ResetPasswordPage from "./components/ResetPasswordPage";
 import CheckoutPage from "./components/CheckoutPage";
 import OrderConfirmationPage from "./components/OrderConfirmationPage";
-import { useCart } from './context/CartContext'; // Import useCart
+import { useCart } from './context/CartContext';
 import './theme.css';
+import { getPendingCommentsCount } from "./api/commentService";
+import { jwtDecode } from "jwt-decode";
+
+interface DecodedToken {
+    sub: string;
+    roles: string[];
+    iat: number;
+    exp: number;
+}
 
 const Navbar: React.FC<{ isAuthenticated: boolean, setIsAuthenticated: (isAuth: boolean) => void }> = ({ isAuthenticated, setIsAuthenticated }) => {
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const { cartItems } = useCart();
     const totalItemsInCart = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+    const [pendingCommentsCount, setPendingCommentsCount] = useState(0);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (isAuthenticated && token) {
+            try {
+                const decodedToken = jwtDecode<DecodedToken>(token);
+                const userRoles = decodedToken.roles;
+                if (userRoles.includes('ROLE_ADMIN') || userRoles.includes('ROLE_MODERATOR')) {
+                    getPendingCommentsCount()
+                        .then(setPendingCommentsCount)
+                        .catch(err => console.error("Failed to fetch pending comments count", err));
+                }
+            } catch (error) {
+                console.error("Invalid token:", error);
+            }
+        }
+    }, [isAuthenticated]);
+
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -82,6 +112,22 @@ const Navbar: React.FC<{ isAuthenticated: boolean, setIsAuthenticated: (isAuth: 
         fontWeight: 'bold'
     };
 
+    const notificationBadgeStyle: React.CSSProperties = {
+        border: '2px solid red',
+        color: 'red',
+        borderRadius: '50%',
+        width: '20px',
+        height: '20px',
+        display: 'inline-flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        fontSize: '0.8rem',
+        fontWeight: 'bold',
+        marginLeft: '5px',
+        backgroundColor: 'transparent'
+    };
+
+
     return (
         <nav style={navStyle}>
             <div style={navLinksContainerStyle}>
@@ -102,6 +148,10 @@ const Navbar: React.FC<{ isAuthenticated: boolean, setIsAuthenticated: (isAuth: 
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <Link to="/dashboard" style={linkStyle}>
                             Panel
+                            {pendingCommentsCount > 0 && <span style={notificationBadgeStyle}>{pendingCommentsCount}</span>}
+                        </Link>
+                        <Link to="/cart" style={linkStyle}>
+                            Koszyk
                             {totalItemsInCart > 0 && <span style={cartBadgeStyle}>{totalItemsInCart}</span>}
                         </Link>
                         <button onClick={handleLogout} style={{ ...linkStyle, background: 'none', border: 'none', cursor: 'pointer', marginLeft: '1rem' }}>
@@ -163,6 +213,22 @@ function App() {
                   </ProtectedRoute>
               }
           />
+          <Route
+                path="/admin/comments"
+                element={
+                    <ProtectedRoute roles={['ROLE_ADMIN', 'ROLE_MODERATOR']}>
+                        <CommentVerificationPage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/orders"
+                element={
+                    <ProtectedRoute>
+                        <OrderHistoryPage />
+                    </ProtectedRoute>
+                }
+            />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </>

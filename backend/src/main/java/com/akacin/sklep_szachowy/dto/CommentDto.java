@@ -1,6 +1,7 @@
 package com.akacin.sklep_szachowy.dto;
 
 import com.akacin.sklep_szachowy.model.Comment;
+import com.akacin.sklep_szachowy.model.enums.ECommentStatus;
 
 import java.time.LocalDateTime;
 
@@ -9,12 +10,18 @@ public class CommentDto {
     private String content;
     private String authorName;
     private LocalDateTime createdAt;
+    private ECommentStatus status;
+    private Long productId;
+    private String productName;
 
-    public CommentDto(Long id, String content, String authorName, LocalDateTime createdAt) {
+    public CommentDto(Long id, String content, String authorName, LocalDateTime createdAt, ECommentStatus status, Long productId, String productName) {
         this.id = id;
         this.content = content;
         this.authorName = authorName;
         this.createdAt = createdAt;
+        this.status = status;
+        this.productId = productId;
+        this.productName = productName;
     }
 
     public static CommentDto fromEntity(Comment comment) {
@@ -22,7 +29,10 @@ public class CommentDto {
                 comment.getId(),
                 comment.getContent(),
                 comment.getAuthor().getUsername(),
-                comment.getCreatedAt()
+                comment.getCreatedAt(),
+                comment.getStatus(),
+                comment.getProduct().getId(),
+                comment.getProduct().getName()
         );
     }
 
@@ -57,5 +67,29 @@ public class CommentDto {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public ECommentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ECommentStatus status) {
+        this.status = status;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }

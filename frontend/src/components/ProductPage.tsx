@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getProductById, type Product as ApiProduct } from '../api/productService';
-import { getCommentsForProduct, addComment, deleteComment } from '../api/commentService';
+import { getCommentsForProduct, createComment, deleteComment } from '../api/commentService';
 import { useCart } from '../context/CartContext';
 import { type CommentDto } from '../types/dto';
 import { jwtDecode } from 'jwt-decode';
@@ -39,10 +39,11 @@ const ProductPage: React.FC = () => {
 
         const fetchProductAndComments = async () => {
             try {
+                const productId = parseInt(id, 10);
                 const productData = await getProductById(id);
                 setProduct(productData);
 
-                const commentsData = await getCommentsForProduct(id);
+                const commentsData = await getCommentsForProduct(productId);
                 setComments(commentsData);
             } catch (err) {
                 setError('Nie udało się załadować danych.');
@@ -65,11 +66,12 @@ const ProductPage: React.FC = () => {
     const handleCommentSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!id || !newComment.trim()) return;
+        const productId = parseInt(id, 10);
 
         try {
-            const addedComment = await addComment(id, newComment);
-            setComments([...comments, addedComment]);
+            await createComment(productId, newComment);
             setNewComment('');
+            alert("Twój komentarz został dodany i czeka na moderację.");
         } catch (err) {
             console.error("Failed to add comment:", err);
             alert("Nie udało się dodać komentarza.");
@@ -87,8 +89,8 @@ const ProductPage: React.FC = () => {
             alert("Nie udało się usunąć komentarza.");
         }
     };
-
-    const canDeleteComments = userRoles.includes('ROLE_ADMIN') || userRoles.includes('ROLE_MODERATOR');
+    
+    const isModeratorOrAdmin = userRoles.includes('ROLE_ADMIN') || userRoles.includes('ROLE_MODERATOR');
 
     const pageStyle: React.CSSProperties = {
         padding: '2rem',
@@ -184,6 +186,15 @@ const ProductPage: React.FC = () => {
         justifyContent: 'center',
     };
 
+    const statusBadgeStyle = (status: 'PENDING' | 'REJECTED'): React.CSSProperties => ({
+        backgroundColor: status === 'PENDING' ? 'var(--color-accent)' : 'var(--color-error)',
+        color: 'white',
+        padding: '2px 8px',
+        borderRadius: '12px',
+        fontSize: '0.8rem',
+        marginLeft: '10px',
+    });
+
     if (loading) return <div style={pageStyle}>Ładowanie...</div>;
     if (error) return <div style={pageStyle}>{error}</div>;
     if (!product) return <div style={pageStyle}>Produkt nie został znaleziony.</div>;
@@ -209,9 +220,12 @@ const ProductPage: React.FC = () => {
                     <h2 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>Komentarze ({comments.length})</h2>
                     
                     {comments.map(comment => (
-                        <div key={comment.id} style={commentStyle}>
+                        <div key={comment.id} style={{...commentStyle, opacity: comment.status !== 'ACCEPTED' && !isModeratorOrAdmin ? 0.5 : 1}}>
                             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
                                 <strong style={{ fontSize: '1.1rem' }}>{comment.authorName}</strong>
+                                {isModeratorOrAdmin && comment.status !== 'ACCEPTED' && (
+                                    <span style={statusBadgeStyle(comment.status)}>{comment.status}</span>
+                                )}
                                 <span style={{ fontSize: '0.9em', color: 'var(--muted-foreground)', marginLeft: '1rem' }}>
                                     {new Date(comment.createdAt).toLocaleString()}
                                 </span>
@@ -219,7 +233,7 @@ const ProductPage: React.FC = () => {
                             <div className="markdown-content" style={{ color: 'var(--foreground)' }}>
                                 <ReactMarkdown children={comment.content} />
                             </div>
-                            {canDeleteComments && (
+                            {isModeratorOrAdmin && (
                                 <button onClick={() => handleCommentDelete(comment.id)} style={deleteButtonStyle}>X</button>
                             )}
                         </div>

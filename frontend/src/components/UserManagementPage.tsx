@@ -1,17 +1,49 @@
 import React, { useEffect, useState } from 'react';
-import { type UserDto, type RoleDto } from '../types/dto';
+import type { UserDto, RoleDto, CategoryDto } from '../types/dto';
 import { getAllUsers, deleteUser, updateUserRoles, updateUser } from '../api/userService';
+import { getAllCategories } from '../api/categoryService';
 
 const UserManagementPage: React.FC = () => {
     const [users, setUsers] = useState<UserDto[]>([]);
+    const [categories, setCategories] = useState<CategoryDto[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [editingUser, setEditingUser] = useState<UserDto | null>(null);
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
+    const [moderatorCategorySelections, setModeratorCategorySelections] = useState<Map<number, number>>(new Map());
 
     useEffect(() => {
-        fetchUsers();
+        const fetchInitialData = async () => {
+            try {
+                setLoading(true);
+                const [usersData, categoriesData] = await Promise.all([
+                    getAllUsers(),
+                    getAllCategories()
+                ]);
+                setUsers(usersData);
+                setCategories(categoriesData);
+
+                const initialSelections = new Map<number, number>();
+                usersData.forEach(user => {
+                    const moderatorRole = user.roles.find(role => role.name === 'ROLE_MODERATOR');
+                    if (moderatorRole && moderatorRole.categoryId) {
+                        initialSelections.set(user.id, moderatorRole.categoryId);
+                    } else if (categoriesData.length > 0) {
+                        initialSelections.set(user.id, categoriesData[0].id);
+                    }
+                });
+                setModeratorCategorySelections(initialSelections);
+
+            } catch (err) {
+                setError('Failed to fetch data.');
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchInitialData();
     }, []);
 
     const fetchUsers = async () => {
@@ -40,18 +72,30 @@ const UserManagementPage: React.FC = () => {
     };
 
     const handleRoleChange = async (userId: number, currentRoles: RoleDto[], roleName: 'ROLE_USER' | 'ROLE_MODERATOR' | 'ROLE_ADMIN', isChecked: boolean) => {
-        let newRoles: string[] = currentRoles.map(role => role.name);
+        let newRoles: RoleDto[] = [...currentRoles];
 
         if (isChecked) {
-            if (!newRoles.includes(roleName)) {
-                newRoles.push(roleName);
+            if (!newRoles.some(role => role.name === roleName)) {
+                const newRole: RoleDto = { id: 0, name: roleName }; // id will be ignored by backend
+                if (roleName === 'ROLE_MODERATOR') {
+                    const categoryId = moderatorCategorySelections.get(userId);
+                    if (categoryId) {
+                        newRole.categoryId = categoryId;
+                    } else if (categories.length > 0) {
+                        newRole.categoryId = categories[0].id;
+                        const newSelections = new Map(moderatorCategorySelections);
+                        newSelections.set(userId, categories[0].id);
+                        setModeratorCategorySelections(newSelections);
+                    }
+                }
+                newRoles.push(newRole);
             }
         } else {
             if (newRoles.length === 1) {
                 alert("A user must have at least one role.");
                 return;
             }
-            newRoles = newRoles.filter(role => role !== roleName);
+            newRoles = newRoles.filter(role => role.name !== roleName);
         }
 
         try {
@@ -60,6 +104,29 @@ const UserManagementPage: React.FC = () => {
         } catch (err) {
             setError('Failed to update user roles.');
             console.error(err);
+        }
+    };
+
+    const handleModeratorCategoryChange = async (userId: number, categoryId: number) => {
+        const newSelections = new Map(moderatorCategorySelections);
+        newSelections.set(userId, categoryId);
+        setModeratorCategorySelections(newSelections);
+
+        const user = users.find(u => u.id === userId);
+        if (user && user.roles.some(r => r.name === 'ROLE_MODERATOR')) {
+            const newRoles: RoleDto[] = user.roles.map(role => {
+                if (role.name === 'ROLE_MODERATOR') {
+                    return { ...role, categoryId: categoryId };
+                }
+                return role;
+            });
+            try {
+                await updateUserRoles(userId, newRoles);
+                fetchUsers(); // Refresh the list
+            } catch (err) {
+                setError('Failed to update user roles.');
+                console.error(err);
+            }
         }
     };
 
@@ -128,6 +195,19 @@ const UserManagementPage: React.FC = () => {
                                         onChange={(e) => handleRoleChange(user.id, user.roles, 'ROLE_MODERATOR', e.target.checked)}
                                     />
                                     Moderator
+                                    {user.roles.some(role => role.name === 'ROLE_MODERATOR') && (
+                                        <select
+                                            style={{ marginLeft: '5px' }}
+                                            value={moderatorCategorySelections.get(user.id) || ''}
+                                            onChange={(e) => handleModeratorCategoryChange(user.id, parseInt(e.target.value, 10))}
+                                        >
+                                            {categories.map(cat => (
+                                                <option key={cat.id} value={cat.id}>
+                                                    {cat.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    )}
                                 </label>
                                 <label style={{ marginLeft: '10px' }}>
                                     <input

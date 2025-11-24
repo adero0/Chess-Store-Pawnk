@@ -14,6 +14,10 @@ public class Role {
     @Column(length = 20)
     private ERole name;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     public Role() {
 
     }
@@ -36,5 +40,13 @@ public class Role {
 
     public void setName(ERole name) {
         this.name = name;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

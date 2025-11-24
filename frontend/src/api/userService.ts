@@ -1,5 +1,5 @@
 import apiClient from './axiosConfig';
-import { type UserDto } from '../types/dto';
+import { type UserDto, type RoleDto } from '../types/dto';
 
 export const getAllUsers = async (): Promise<UserDto[]> => {
     const response = await apiClient.get('/users');
@@ -11,7 +11,7 @@ export const updateUser = async (userId: number, user: { username: string, email
     return response.data;
 };
 
-export const updateUserRoles = async (userId: number, roles: string[]): Promise<UserDto> => {
+export const updateUserRoles = async (userId: number, roles: RoleDto[]): Promise<UserDto> => {
     const response = await apiClient.put(`/users/${userId}/roles`, roles);
     return response.data;
 };

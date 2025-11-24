@@ -5,10 +5,12 @@ import com.akacin.sklep_szachowy.model.enums.ERole;
 public class RoleDto {
     private Integer id;
     private ERole name;
+    private Integer categoryId;
 
-    public RoleDto(Integer id, ERole name) {
+    public RoleDto(Integer id, ERole name, Integer categoryId) {
         this.id = id;
         this.name = name;
+        this.categoryId = categoryId;
     }
 
     public Integer getId() {
@@ -25,5 +27,13 @@ public class RoleDto {
 
     public void setName(ERole name) {
         this.name = name;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 }
