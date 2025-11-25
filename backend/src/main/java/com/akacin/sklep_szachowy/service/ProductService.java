@@ -45,7 +45,7 @@ public class ProductService {
                 author,
                 productRequest.getImageUrl()
         );
-        product.setApproved(false); // Products need to be approved by a moderator/admin
+        product.setApproved(true); // Products need to be approved by a moderator/admin
 
         Product savedProduct = productRepository.save(product);
         return convertToDto(savedProduct);

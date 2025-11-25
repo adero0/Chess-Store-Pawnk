@@ -26,9 +26,12 @@ import java.util.Arrays;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+
 @Configuration
 @EnableMethodSecurity
-public class WebSecurityConfig {
+public class WebSecurityConfig implements WebMvcConfigurer {
   @Autowired
   UserDetailsServiceImpl userDetailsService;
 
@@ -69,7 +72,9 @@ public class WebSecurityConfig {
         .authorizeHttpRequests(auth -> 
           auth.requestMatchers("/api/auth/**").permitAll()
               .requestMatchers("/api/password/**").permitAll()
-              .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll() // Explicitly permit GET requests
+              .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+              .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+              .requestMatchers(HttpMethod.GET, "/api/slider-config/**").permitAll()
               .anyRequest().authenticated()
         );
     
@@ -78,6 +83,12 @@ public class WebSecurityConfig {
     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     
     return http.build();
+  }
+
+  @Override
+  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    registry.addResourceHandler("/uploads/**")
+            .addResourceLocations("file:uploads/");
   }
 
   @Bean
