@@ -73,7 +73,7 @@ public class ProductController {
         String originalFilename = file.getOriginalFilename();
         String fileExtension = originalFilename != null && originalFilename.contains(".") ?
             originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
-        String fileName = UUID.randomUUID().toString() + fileExtension;
+        String fileName = UUID.randomUUID() + fileExtension;
 
         Path filePath = uploadPath.resolve(fileName);
         logger.info("Saving image to: {}", filePath.toAbsolutePath());
