@@ -16,6 +16,10 @@ public class OrderDto {
     private Date deliveryDate;
     private EOrderStatus status;
 
+    public OrderDto() {
+        // Default constructor for JSON deserialization
+    }
+
     public OrderDto(Order order) {
         this.id = order.getId();
         this.totalPrice = order.getTotalPrice();

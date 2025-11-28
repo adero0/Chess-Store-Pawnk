@@ -15,7 +15,7 @@ public class SliderConfigService {
     @Autowired
     private SliderConfigRepository sliderConfigRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public SliderConfigDto getSliderConfig() {
         List<SliderConfig> configs = sliderConfigRepository.findAll();
         SliderConfig config;
