@@ -209,6 +209,50 @@ const Dashboard: React.FC<{ setIsAuthenticated: (isAuth: boolean) => void }> = (
                     </Link>
                 )}
 
+                {isAdmin && (
+                    <Link
+                        to="/admin/theme"
+                        style={cardStyle}
+                        onMouseEnter={(e) => {
+                            Object.assign(e.currentTarget.style, cardHoverStyle);
+                        }}
+                        onMouseLeave={(e) => {
+                            Object.assign(e.currentTarget.style, {
+                                transform: 'none',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                            });
+                        }}
+                    >
+                        <svg style={cardIconStyle} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                        </svg>
+                        <h2 style={cardTitleStyle}>Zarządzanie Motywem</h2>
+                        <p style={cardDescriptionStyle}>Dostosuj kolory główne strony.</p>
+                    </Link>
+                )}
+
+                {isAdmin && (
+                    <Link
+                        to="/orders"
+                        style={cardStyle}
+                        onMouseEnter={(e) => {
+                            Object.assign(e.currentTarget.style, cardHoverStyle);
+                        }}
+                        onMouseLeave={(e) => {
+                            Object.assign(e.currentTarget.style, {
+                                transform: 'none',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                            });
+                        }}
+                    >
+                        <svg style={cardIconStyle} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 3v18h18V3H3zm16 16H5V5h14v14z"/>
+                        </svg>
+                        <h2 style={cardTitleStyle}>Zarządzanie Zamówieniami</h2>
+                        <p style={cardDescriptionStyle}>Zarządzaj statusami zamówień użytkowników.</p>
+                    </Link>
+                )}
+
                 <Link
                     to="/orders"
                     style={cardStyle}
@@ -227,6 +271,26 @@ const Dashboard: React.FC<{ setIsAuthenticated: (isAuth: boolean) => void }> = (
                     </svg>
                     <h2 style={cardTitleStyle}>Historia Zamówień</h2>
                     <p style={cardDescriptionStyle}>Sprawdź swoje zamówienia i statusy dostaw.</p>
+                </Link>
+
+                <Link
+                    to="/shipping-details"
+                    style={cardStyle}
+                    onMouseEnter={(e) => {
+                        Object.assign(e.currentTarget.style, cardHoverStyle);
+                    }}
+                    onMouseLeave={(e) => {
+                        Object.assign(e.currentTarget.style, {
+                            transform: 'none',
+                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        });
+                    }}
+                >
+                    <svg style={cardIconStyle} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                    </svg>
+                    <h2 style={cardTitleStyle}>Adres Wysyłki</h2>
+                    <p style={cardDescriptionStyle}>Zarządzaj swoim adresem wysyłki.</p>
                 </Link>
             </div>
         </div>

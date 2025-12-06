@@ -19,11 +19,16 @@ export interface RoleDto {
     categoryId?: number;
 }
 
-export interface UserDto {
+export interface User {
     id: number;
     username: string;
     email: string;
     roles: RoleDto[];
+    shippingName?: string;
+    shippingAddress?: string;
+    shippingCity?: string;
+    shippingPostalCode?: string;
+    shippingCountry?: string;
 }
 
 export interface OrderItemDto {
@@ -40,4 +45,12 @@ export interface OrderDto {
     orderDate: string;
     deliveryDate: string;
     status: 'PENDING' | 'PAID' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+}
+
+export interface ThemeColor {
+    id: number;
+    name: 'primary' | 'secondary' | 'accent';
+    h: number;
+    c: number;
+    l: number;
 }

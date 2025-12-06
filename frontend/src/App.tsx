@@ -16,9 +16,12 @@ import ResetPasswordPage from "./components/ResetPasswordPage";
 import CheckoutPage from "./components/CheckoutPage";
 import OrderConfirmationPage from "./components/OrderConfirmationPage";
 import AddProductPage from "./components/AddProductPage";
+import ShippingDetailsPage from "./components/ShippingDetailsPage";
+import ThemeManagementPage from "./components/ThemeManagementPage"; // Import the new component
 import { useCart } from './context/CartContext';
 import './theme.css';
 import { getPendingCommentsCount } from "./api/commentService";
+import { getThemeColors } from "./api/themeService";
 import { jwtDecode } from "jwt-decode";
 
 interface DecodedToken {
@@ -88,7 +91,7 @@ const Navbar: React.FC<{ isAuthenticated: boolean, setIsAuthenticated: (isAuth: 
   const dropdownContentStyle: React.CSSProperties = {
     display: isDropdownOpen ? 'block' : 'none',
     position: 'absolute',
-    backgroundColor: 'var(--color-surface)',
+    backgroundColor: 'var(--color-secondary)',
     minWidth: '160px',
     boxShadow: 'var(--box-shadow)',
     zIndex: 1,
@@ -155,7 +158,7 @@ const Navbar: React.FC<{ isAuthenticated: boolean, setIsAuthenticated: (isAuth: 
                   Koszyk
                   {totalItemsInCart > 0 && <span style={cartBadgeStyle}>{totalItemsInCart}</span>}
                 </Link>
-                <button onClick={handleLogout} style={{ ...linkStyle, background: 'none', border: 'none', cursor: 'pointer', marginLeft: '1rem' }}>
+                <button onClick={handleLogout} style={{ ...linkStyle, backgroundColor: 'var(--color-accent)', color: 'var(--accent-foreground)', border: 'none', cursor: 'pointer', marginLeft: '1rem', padding: '0.5rem 1rem', borderRadius: 'var(--radius)' }}>
                   Wyloguj
                 </button>
               </div>
@@ -169,6 +172,22 @@ const Navbar: React.FC<{ isAuthenticated: boolean, setIsAuthenticated: (isAuth: 
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+
+  useEffect(() => {
+    const applyTheme = async () => {
+      try {
+        const colors = await getThemeColors();
+        colors.forEach(color => {
+          document.documentElement.style.setProperty(`--${color.name.charAt(0)}-h`, String(color.h));
+          document.documentElement.style.setProperty(`--${color.name.charAt(0)}-c`, String(color.c));
+          document.documentElement.style.setProperty(`--${color.name.charAt(0)}-l`, String(color.l));
+        });
+      } catch (error) {
+        console.error("Failed to load theme colors:", error);
+      }
+    };
+    applyTheme();
+  }, []);
 
   return (
       <>
@@ -215,6 +234,14 @@ function App() {
               }
           />
           <Route
+              path="/admin/theme"
+              element={
+                  <ProtectedRoute roles={['ROLE_ADMIN']}>
+                      <ThemeManagementPage />
+                  </ProtectedRoute>
+              }
+          />
+          <Route
               path="/admin/comments"
               element={
                 <ProtectedRoute roles={['ROLE_ADMIN', 'ROLE_MODERATOR']}>
@@ -235,6 +262,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <OrderHistoryPage />
+                </ProtectedRoute>
+              }
+          />
+          <Route
+              path="/shipping-details"
+              element={
+                <ProtectedRoute>
+                  <ShippingDetailsPage />
                 </ProtectedRoute>
               }
           />

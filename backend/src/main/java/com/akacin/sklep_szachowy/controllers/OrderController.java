@@ -30,4 +30,17 @@ public class OrderController {
         String username = authentication.getName();
         return ResponseEntity.ok(orderService.getOrdersForUser(username));
     }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<OrderDto>> getAllOrders() {
+        return ResponseEntity.ok(orderService.getAllOrders());
+    }
+
+    @PutMapping("/{orderId}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> updateOrderStatus(@PathVariable Long orderId, @RequestBody String status) {
+        orderService.updateOrderStatus(orderId, status);
+        return ResponseEntity.ok().build();
+    }
 }

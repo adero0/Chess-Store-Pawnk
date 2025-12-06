@@ -38,6 +38,21 @@ public class User {
              inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Role> roles = new HashSet<>();
 
+  @Size(max = 100)
+  private String shippingName;
+
+  @Size(max = 255)
+  private String shippingAddress;
+
+  @Size(max = 100)
+  private String shippingCity;
+
+  @Size(max = 20)
+  private String shippingPostalCode;
+
+  @Size(max = 100)
+  private String shippingCountry;
+
   public User() {
   }
 
@@ -47,44 +62,83 @@ public class User {
     this.password = password;
   }
 
-public Long getId() {
-	return id;
-}
+  public Long getId() {
+    return id;
+  }
 
-public void setId(Long id) {
-	this.id = id;
-}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-public String getUsername() {
-	return username;
-}
+  public String getUsername() {
+    return username;
+  }
 
-public void setUsername(String username) {
-	this.username = username;
-}
+  public void setUsername(String username) {
+    this.username = username;
+  }
 
-public String getEmail() {
-	return email;
-}
+  public String getEmail() {
+    return email;
+  }
 
-public void setEmail(String email) {
-	this.email = email;
-}
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-public String getPassword() {
-	return password;
-}
+  public String getPassword() {
+    return password;
+  }
 
-public void setPassword(String password) {
-	this.password = password;
-}
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-public Set<Role> getRoles() {
-	return roles;
-}
+  public Set<Role> getRoles() {
+    return roles;
+  }
 
-public void setRoles(Set<Role> roles) {
-	this.roles = roles;
-}
-  
+  public void setRoles(Set<Role> roles) {
+    this.roles = roles;
+  }
+
+  public String getShippingName() {
+    return shippingName;
+  }
+
+  public void setShippingName(String shippingName) {
+    this.shippingName = shippingName;
+  }
+
+  public String getShippingAddress() {
+    return shippingAddress;
+  }
+
+  public void setShippingAddress(String shippingAddress) {
+    this.shippingAddress = shippingAddress;
+  }
+
+  public String getShippingCity() {
+    return shippingCity;
+  }
+
+  public void setShippingCity(String shippingCity) {
+    this.shippingCity = shippingCity;
+  }
+
+  public String getShippingPostalCode() {
+    return shippingPostalCode;
+  }
+
+  public void setShippingPostalCode(String shippingPostalCode) {
+    this.shippingPostalCode = shippingPostalCode;
+  }
+
+  public String getShippingCountry() {
+    return shippingCountry;
+  }
+
+  public void setShippingCountry(String shippingCountry) {
+    this.shippingCountry = shippingCountry;
+  }
 }

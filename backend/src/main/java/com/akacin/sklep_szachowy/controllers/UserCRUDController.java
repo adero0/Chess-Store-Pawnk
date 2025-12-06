@@ -30,6 +30,12 @@ public class UserCRUDController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
+    @GetMapping("/by-username/{username}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserDto> getUserByUsername(@PathVariable String username) {
+        return ResponseEntity.ok(userService.getUserByUsername(username));
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody com.akacin.sklep_szachowy.dto.UserUpdateDto userUpdateDto) {
@@ -40,6 +46,12 @@ public class UserCRUDController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDto> updateUserRoles(@PathVariable Long id, @RequestBody Set<com.akacin.sklep_szachowy.dto.RoleDto> roles) {
         return ResponseEntity.ok(userService.updateUserRoles(id, roles));
+    }
+
+    @PutMapping("/{id}/shipping")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserDto> updateShippingDetails(@PathVariable Long id, @RequestBody com.akacin.sklep_szachowy.dto.ShippingDetailsDto shippingDetailsDto) {
+        return ResponseEntity.ok(userService.updateUserShippingDetails(id, shippingDetailsDto));
     }
 
     @DeleteMapping("/{id}")

@@ -31,7 +31,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getRoles()))
+                .map(UserDto::new)
                 .collect(Collectors.toList());
     }
 
@@ -39,7 +39,14 @@ public class UserService {
     public UserDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-        return new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getRoles());
+        return new UserDto(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserDto getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+        return new UserDto(user);
     }
 
     @Transactional
@@ -56,7 +63,21 @@ public class UserService {
         user.setEmail(userUpdateDto.getEmail());
 
         userRepository.save(user);
-        return new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getRoles());
+        return new UserDto(user);
+    }
+    @Transactional
+    public UserDto updateUserShippingDetails(Long userId, com.akacin.sklep_szachowy.dto.ShippingDetailsDto shippingDetailsDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        user.setShippingName(shippingDetailsDto.getShippingName());
+        user.setShippingAddress(shippingDetailsDto.getShippingAddress());
+        user.setShippingCity(shippingDetailsDto.getShippingCity());
+        user.setShippingPostalCode(shippingDetailsDto.getShippingPostalCode());
+        user.setShippingCountry(shippingDetailsDto.getShippingCountry());
+
+        userRepository.save(user);
+        return new UserDto(user);
     }
 
     @Transactional
@@ -95,6 +116,6 @@ public class UserService {
 
         user.setRoles(roles);
         userRepository.save(user);
-        return new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getRoles());
+        return new UserDto(user);
     }
 }

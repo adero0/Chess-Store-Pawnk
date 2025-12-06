@@ -15,6 +15,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.akacin.sklep_szachowy.model.enums.EOrderStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.Date;
 import java.util.List;
@@ -91,5 +93,20 @@ public class OrderService {
         return orderRepository.findByUser_Username(username).stream()
                 .map(OrderDto::new)
                 .collect(Collectors.toList());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<OrderDto> getAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(OrderDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public void updateOrderStatus(Long orderId, String status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
+        order.setStatus(EOrderStatus.valueOf(status));
+        orderRepository.save(order);
     }
 }

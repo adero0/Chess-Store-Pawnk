@@ -220,24 +220,47 @@ const ProductPage: React.FC = () => {
                     <h2 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>Komentarze ({comments.length})</h2>
                     
                     {comments.map(comment => (
-                        <div key={comment.id} style={{...commentStyle, opacity: comment.status !== 'ACCEPTED' && !isModeratorOrAdmin ? 0.5 : 1}}>
+                        <div
+                            key={comment.id}
+                            style={{
+                                ...commentStyle,
+                                opacity: comment.status !== 'ACCEPTED' && !isModeratorOrAdmin ? 0.5 : 1
+                            }}
+                        >
                             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
                                 <strong style={{ fontSize: '1.1rem' }}>{comment.authorName}</strong>
                                 {isModeratorOrAdmin && comment.status !== 'ACCEPTED' && (
                                     <span style={statusBadgeStyle(comment.status)}>{comment.status}</span>
                                 )}
-                                <span style={{ fontSize: '0.9em', color: 'var(--muted-foreground)', marginLeft: '1rem' }}>
-                                    {new Date(comment.createdAt).toLocaleString()}
-                                </span>
+                                <span
+                                    style={{
+                                        fontSize: '0.9em',
+                                        color: 'var(--muted-foreground)',
+                                        marginLeft: '1rem'
+                                    }}
+                                >
+                {new Date(comment.createdAt).toLocaleString()}
+            </span>
                             </div>
-                            <div className="markdown-content" style={{ color: 'var(--foreground)' }}>
-                                <ReactMarkdown children={comment.content} />
-                            </div>
+
+                            {/* Render HTML */}
+                            <div
+                                className="html-content"
+                                style={{ color: 'var(--foreground)' }}
+                                dangerouslySetInnerHTML={{ __html: comment.content }}
+                            />
+
                             {isModeratorOrAdmin && (
-                                <button onClick={() => handleCommentDelete(comment.id)} style={deleteButtonStyle}>X</button>
+                                <button
+                                    onClick={() => handleCommentDelete(comment.id)}
+                                    style={deleteButtonStyle}
+                                >
+                                    X
+                                </button>
                             )}
                         </div>
-                    ))}
+                    ))
+                    }
 
                     {isAuthenticated && (
                         <form onSubmit={handleCommentSubmit} style={{ marginTop: '2rem' }}>
